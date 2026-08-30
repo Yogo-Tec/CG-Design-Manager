@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="CG-Designer Manager studio operations dashboard">
+  <title>Dashboard | CG-Designer Manager</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="/assets/css/app.css" rel="stylesheet">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar" aria-label="Primary navigation">
+      <a class="brand" href="/" aria-label="CGDM dashboard">
+        <span class="brand-mark">CG</span>
+        <span><strong>CGDM</strong><small>Design operations</small></span>
+      </a>
+      <nav class="sidebar-nav">
+        <p class="nav-label">Workspace</p>
+        <a class="nav-link active" href="/"><i class="bi bi-grid-1x2-fill"></i><span>Dashboard</span></a>
+        <a class="nav-link" href="#"><i class="bi bi-people"></i><span>Clients</span></a>
+        <a class="nav-link" href="#"><i class="bi bi-folder2-open"></i><span>Projects</span><span class="nav-count">12</span></a>
+        <a class="nav-link" href="#"><i class="bi bi-palette2"></i><span>Design Jobs</span><span class="nav-count accent">8</span></a>
+        <a class="nav-link" href="#"><i class="bi bi-person-badge"></i><span>Designers</span></a>
+        <p class="nav-label mt-4">Production</p>
+        <a class="nav-link" href="#"><i class="bi bi-arrow-repeat"></i><span>Revisions</span></a>
+        <a class="nav-link" href="#"><i class="bi bi-file-earmark-image"></i><span>Proofs</span></a>
+        <a class="nav-link" href="#"><i class="bi bi-patch-check"></i><span>Approvals</span></a>
+        <a class="nav-link" href="#"><i class="bi bi-wallet2"></i><span>Payments</span></a>
+        <a class="nav-link" href="#"><i class="bi bi-bar-chart"></i><span>Reports</span></a>
+      </nav>
+      <div class="sidebar-footer">
+        <a class="nav-link" href="#"><i class="bi bi-gear"></i><span>Settings</span></a>
+        <div class="storage-meter"><span><i class="bi bi-cloud-check"></i> Storage</span><strong>38%</strong></div>
+        <div class="progress" role="progressbar" aria-label="Storage used" aria-valuenow="38" aria-valuemin="0" aria-valuemax="100"><div class="progress-bar" style="width:38%"></div></div>
+      </div>
+    </aside>
+
+    <div class="main-wrap">
+      <header class="topbar">
+        <button class="icon-button menu-button" id="menuButton" aria-label="Toggle navigation" aria-expanded="false"><i class="bi bi-list"></i></button>
+        <div class="search-box"><i class="bi bi-search"></i><input type="search" placeholder="Search clients, projects, jobs…" aria-label="Search"><kbd>⌘ K</kbd></div>
+        <div class="topbar-actions">
+          <button class="icon-button" aria-label="Notifications"><i class="bi bi-bell"></i><span class="notification-dot"></span></button>
+          <div class="vr"></div>
+          <button class="profile-button" id="logoutButton" aria-label="Sign out" title="Sign out"><span class="avatar" id="profileAvatar">AK</span><span class="profile-copy"><strong id="profileName">Arjun Kumar</strong><small id="profileRole">Administrator</small></span><i class="bi bi-box-arrow-right"></i></button>
+        </div>
+      </header>
+
+      <main class="content">
+        <section class="page-heading">
+          <div><p class="eyebrow">Monday, 31 August</p><h1>Good morning, Arjun</h1><p>Here’s what’s happening across your design studio today.</p></div>
+          <button class="btn btn-primary primary-action"><i class="bi bi-plus-lg"></i> New design job</button>
+        </section>
+
+        <section class="metrics-grid" aria-label="Key metrics">
+          <article class="metric-card"><div class="metric-icon blue"><i class="bi bi-folder2-open"></i></div><div><span>Active projects</span><strong>24</strong><small class="positive"><i class="bi bi-arrow-up"></i> 8% this month</small></div></article>
+          <article class="metric-card"><div class="metric-icon violet"><i class="bi bi-palette2"></i></div><div><span>Jobs in progress</span><strong>18</strong><small>Across 9 designers</small></div></article>
+          <article class="metric-card"><div class="metric-icon amber"><i class="bi bi-hourglass-split"></i></div><div><span>Awaiting approval</span><strong>7</strong><small class="attention">3 due today</small></div></article>
+          <article class="metric-card"><div class="metric-icon green"><i class="bi bi-currency-rupee"></i></div><div><span>Revenue this month</span><strong>₹2.48L</strong><small class="positive"><i class="bi bi-arrow-up"></i> 12.4% vs last month</small></div></article>
+        </section>
+
+        <div class="dashboard-grid">
+          <section class="panel work-panel">
+            <div class="panel-heading"><div><h2>Priority work</h2><p>Jobs requiring attention today</p></div><a href="#">View all <i class="bi bi-arrow-right"></i></a></div>
+            <div class="table-responsive">
+              <table class="table align-middle mb-0">
+                <thead><tr><th>Design job</th><th>Client</th><th>Designer</th><th>Status</th><th>Due</th><th></th></tr></thead>
+                <tbody id="priorityTable"><tr><td colspan="6"><div class="loading-state"><span class="spinner-border spinner-border-sm"></span> Loading priority work…</div></td></tr></tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="panel activity-panel">
+            <div class="panel-heading"><div><h2>Recent activity</h2><p>Latest studio updates</p></div><button class="icon-button" aria-label="Activity options"><i class="bi bi-three-dots"></i></button></div>
+            <div class="activity-list" id="activityList"></div>
+          </section>
+
+          <section class="panel workload-panel">
+            <div class="panel-heading"><div><h2>Designer workload</h2><p>Current capacity this week</p></div><a href="#">Manage team</a></div>
+            <div id="workloadList" class="workload-list"></div>
+          </section>
+
+          <section class="panel deadlines-panel">
+            <div class="panel-heading"><div><h2>Upcoming deadlines</h2><p>Next 7 days</p></div><button class="icon-button" aria-label="Open calendar"><i class="bi bi-calendar3"></i></button></div>
+            <div id="deadlineList" class="deadline-list"></div>
+          </section>
+        </div>
+      </main>
+    </div>
+  </div>
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+  <div class="toast-container position-fixed bottom-0 end-0 p-3"><div id="appToast" class="toast" role="status"><div class="toast-body"></div></div></div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+  <script type="module" src="/assets/js/app.js"></script>
+</body>
+</html>

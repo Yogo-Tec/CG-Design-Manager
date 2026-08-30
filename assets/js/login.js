@@ -1,0 +1,5 @@
+import { api } from "./api.js";
+const form=document.querySelector("#loginForm"),alertBox=document.querySelector("#loginAlert"),button=document.querySelector("#loginButton");
+try{await api("/auth/me");location.replace("/pages/dashboard.html")}catch{}
+document.querySelector("#togglePassword").addEventListener("click",()=>{const input=document.querySelector("#password");input.type=input.type==="password"?"text":"password"});
+form.addEventListener("submit",async(event)=>{event.preventDefault();alertBox.classList.add("d-none");if(!form.checkValidity()){form.classList.add("was-validated");return}button.disabled=true;button.innerHTML='<span class="spinner-border spinner-border-sm"></span> Signing in…';try{await api("/auth/login",{method:"POST",body:JSON.stringify({email:form.email.value,password:form.password.value})});location.replace("/pages/dashboard.html")}catch(error){alertBox.textContent=error.message;alertBox.classList.remove("d-none");button.disabled=false;button.innerHTML='<span>Sign in</span><i class="bi bi-arrow-right"></i>'}});
