@@ -20,3 +20,11 @@ test("dashboard requires authentication and accepts a valid session", async (t) 
   assert.equal(dashboard.status, 200);
   assert.equal((await dashboard.json()).data.priorityJobs.length, 4);
 });
+
+test("admin can create, search and update clients", async (t) => {
+  const server=app.listen(0);t.after(()=>server.close());const base=`http://127.0.0.1:${server.address().port}`;
+  const login=await fetch(`${base}/api/auth/login`,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({email:"admin@cgdm.local",password:"admin123"})});const cookie=login.headers.get("set-cookie").split(";")[0];
+  const created=await fetch(`${base}/api/v1/clients`,{method:"POST",headers:{"content-type":"application/json",cookie},body:JSON.stringify({client_name:"Test Client",company_name:"Test Studio",email:"client@example.com",status:"ACTIVE"})});assert.equal(created.status,201);const client=(await created.json()).data.client;
+  const search=await fetch(`${base}/api/v1/clients?search=Test%20Studio`,{headers:{cookie}});assert.equal((await search.json()).data.clients.some(x=>x.id===client.id),true);
+  const updated=await fetch(`${base}/api/v1/clients/${client.id}`,{method:"PUT",headers:{"content-type":"application/json",cookie},body:JSON.stringify({...client,client_name:"Updated Client",status:"INACTIVE"})});assert.equal(updated.status,200);assert.equal((await updated.json()).data.client.status,"INACTIVE");
+});
