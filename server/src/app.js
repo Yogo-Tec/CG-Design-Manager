@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 import dashboardRouter from "./routes/dashboard.routes.js";
 import authRouter from "./routes/auth.routes.js";
 import clientRouter from "./routes/client.routes.js";
+import operationsRouter from "./routes/operations.routes.js";
 import { requireAuth } from "./middleware/auth.middleware.js";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 export const app = express();
@@ -18,5 +19,6 @@ app.get("/api/health", (_req, res) => res.json({ data: { status: "ok", service: 
 app.use("/api/auth", authRouter);
 app.use("/api/dashboard", requireAuth, dashboardRouter);
 app.use("/api/v1/clients", requireAuth, clientRouter);
+app.use("/api/v1/operations", requireAuth, operationsRouter);
 app.use("/api", (_req, res) => res.status(404).json({ message: "API route not found" }));
 app.use((error, _req, res, _next) => { if(!error.status)console.error(error); res.status(error.status||500).json({ message:error.status?error.message:"An unexpected error occurred", errors:error.errors }); });

@@ -12,10 +12,11 @@ router.post("/login", loginLimiter, async (req, res, next) => {
     if (!/^\S+@\S+\.\S+$/.test(email) || password.length < 8) return res.status(400).json({ message: "Enter a valid email and password" });
     const result = await authService.login(email, password);
     if (!result) return res.status(401).json({ message: "Invalid email or password" });
-    res.cookie("cgdm_session", result.token, { httpOnly: true, sameSite: "strict", secure: process.env.NODE_ENV === "production", maxAge: 8 * 60 * 60 * 1000, path: "/" });
+    res.cookie("cgdm_session", result.token, { httpOnly: true, sameSite: "strict", secure: process.env.NODE_ENV === "production", maxAge: (result.expiresIn||8*60*60)*1000, path: "/" });
+    if(result.refreshToken)res.cookie("cgdm_refresh",result.refreshToken,{httpOnly:true,sameSite:"strict",secure:process.env.NODE_ENV==="production",maxAge:30*24*60*60*1000,path:"/api/auth"});
     res.json({ data: { user: result.user } });
   } catch (error) { next(error); }
 });
 router.get("/me", requireAuth, (req, res) => res.json({ data: { user: { id: req.user.sub, email: req.user.email, displayName: req.user.name, role: req.user.role } } }));
-router.post("/logout", (_req, res) => { res.clearCookie("cgdm_session", { path: "/" }); res.json({ data: { success: true } }); });
+router.post("/logout", (_req, res) => { res.clearCookie("cgdm_session", { path: "/" });res.clearCookie("cgdm_refresh",{path:"/api/auth"}); res.json({ data: { success: true } }); });
 export default router;
