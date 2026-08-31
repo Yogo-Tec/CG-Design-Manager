@@ -5,7 +5,7 @@ test("health endpoint returns ok", async (t) => {
   const server = app.listen(0); t.after(() => server.close());
   const response = await fetch(`http://127.0.0.1:${server.address().port}/api/health`);
   assert.equal(response.status, 200);
-  assert.deepEqual(await response.json(), { data: { status: "ok", service: "cgdm-api" } });
+  assert.deepEqual(await response.json(), { data: { status: "ok", service: "cgdm-api", dependencies: { database: "not_configured", supabase: "not_configured" } } });
 });
 
 test("dashboard requires authentication and accepts a valid session", async (t) => {
