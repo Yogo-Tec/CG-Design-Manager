@@ -1,0 +1,11 @@
+CREATE SEQUENCE IF NOT EXISTS project_code_seq START 1;
+CREATE SEQUENCE IF NOT EXISTS design_job_code_seq START 1;
+CREATE TABLE job_assignments (design_job_id UUID NOT NULL REFERENCES design_jobs(id) ON DELETE CASCADE, designer_id UUID NOT NULL REFERENCES designers(id), is_lead BOOLEAN NOT NULL DEFAULT FALSE, assigned_at TIMESTAMPTZ NOT NULL DEFAULT NOW(), PRIMARY KEY(design_job_id,designer_id));
+CREATE UNIQUE INDEX one_lead_per_job_idx ON job_assignments(design_job_id) WHERE is_lead;
+CREATE TABLE approvals (id UUID PRIMARY KEY DEFAULT gen_random_uuid(), proof_id UUID NOT NULL REFERENCES proofs(id), decision VARCHAR(30) NOT NULL CHECK(decision IN ('PENDING','APPROVED','CHANGES_REQUESTED')), feedback TEXT, decided_by VARCHAR(160), decided_at TIMESTAMPTZ, created_at TIMESTAMPTZ NOT NULL DEFAULT NOW());
+CREATE TABLE additional_charges (id UUID PRIMARY KEY DEFAULT gen_random_uuid(), design_job_id UUID NOT NULL REFERENCES design_jobs(id), description VARCHAR(255) NOT NULL, amount NUMERIC(12,2) NOT NULL CHECK(amount>=0), created_by UUID REFERENCES users(id), created_at TIMESTAMPTZ NOT NULL DEFAULT NOW());
+ALTER TABLE payments ADD COLUMN IF NOT EXISTS direction VARCHAR(20) NOT NULL DEFAULT 'RECEIVABLE' CHECK(direction IN ('RECEIVABLE','PAYABLE'));
+ALTER TABLE payments ADD COLUMN IF NOT EXISTS stage VARCHAR(30) NOT NULL DEFAULT 'PENDING' CHECK(stage IN ('PENDING','READY','PAID'));
+ALTER TABLE payments ADD COLUMN IF NOT EXISTS designer_id UUID REFERENCES designers(id);
+CREATE INDEX approvals_proof_idx ON approvals(proof_id,created_at DESC);
+CREATE INDEX charges_job_idx ON additional_charges(design_job_id,created_at DESC);

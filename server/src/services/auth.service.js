@@ -8,7 +8,7 @@ const publicUser = ({ id, email, display_name, role }) => ({ id, email, displayN
 
 export const authService = {
   async login(email, password) {
-    if(supabaseEnabled){const {data,error}=await supabase.auth.signInWithPassword({email,password});if(error||!data.user)return null;const role=String(data.user.app_metadata?.role||data.user.user_metadata?.role||"DESIGNER").toUpperCase();return{user:{id:data.user.id,email:data.user.email,displayName:data.user.user_metadata?.display_name||data.user.email.split("@")[0],role:role==="ADMIN"?"ADMIN":"DESIGNER"},token:data.session.access_token,refreshToken:data.session.refresh_token,expiresIn:data.session.expires_in}}
+    if(supabaseEnabled){const {data,error}=await supabase.auth.signInWithPassword({email,password});if(error||!data.user)return null;const role=String(data.user.app_metadata?.role||data.user.user_metadata?.role||"DESIGNER").toUpperCase();const user={id:data.user.id,email:data.user.email,displayName:data.user.user_metadata?.display_name||data.user.email.split("@")[0],role:role==="ADMIN"?"ADMIN":"DESIGNER"};await userRepository.syncExternalUser(user);return{user,token:data.session.access_token,refreshToken:data.session.refresh_token,expiresIn:data.session.expires_in}}
     const user = await userRepository.findByEmail(email);
     if (!user || user.status !== "ACTIVE" || !(await bcrypt.compare(password, user.password_hash))) return null;
     await userRepository.recordLogin(user.id);

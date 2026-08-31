@@ -22,5 +22,9 @@ export const userRepository = {
   async recordLogin(id) {
     if (!databaseEnabled) return;
     await query("UPDATE users SET last_login_at = NOW(), updated_at = NOW() WHERE id = $1", [id]);
+  },
+  async syncExternalUser(user) {
+    if (!databaseEnabled) return;
+    await query(`INSERT INTO users(id,email,password_hash,display_name,role,status,last_login_at) VALUES($1,$2,'SUPABASE_MANAGED',$3,$4,'ACTIVE',NOW()) ON CONFLICT(id) DO UPDATE SET email=EXCLUDED.email,display_name=EXCLUDED.display_name,role=EXCLUDED.role,last_login_at=NOW(),updated_at=NOW()`,[user.id,user.email,user.displayName,user.role]);
   }
 };
