@@ -1,6 +1,9 @@
+process.env.SUPABASE_URL="";
+process.env.SUPABASE_ANON_KEY="";
+process.env.DATABASE_URL="";
 import test from "node:test";
 import assert from "node:assert/strict";
-import { app } from "../server/src/app.js";
+const { app } = await import("../server/src/app.js");
 test("health endpoint returns ok", async (t) => {
   const server = app.listen(0); t.after(() => server.close());
   const response = await fetch(`http://127.0.0.1:${server.address().port}/api/health`);
