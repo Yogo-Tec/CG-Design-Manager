@@ -9,6 +9,7 @@
     "start": "node server/src/server.js",
     "db:migrate": "node server/scripts/migrate.js",
     "backup": "node server/scripts/backup.js",
+    "verify:production": "node server/scripts/verify-production.js",
     "test": "node --test"
   },
   "engines": {
