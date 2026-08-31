@@ -5,6 +5,7 @@ import { requireAuth } from "../middleware/auth.middleware.js";
 
 const router = Router();
 const loginLimiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 10, standardHeaders: "draft-8", legacyHeaders: false, message: { message: "Too many login attempts. Try again later." } });
+const recoveryLimiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 5, standardHeaders: "draft-8", legacyHeaders: false, message: { message: "Too many recovery attempts. Try again later." } });
 router.post("/login", loginLimiter, async (req, res, next) => {
   try {
     const email = String(req.body.email || "").trim().toLowerCase();
@@ -17,6 +18,8 @@ router.post("/login", loginLimiter, async (req, res, next) => {
     res.json({ data: { user: result.user } });
   } catch (error) { next(error); }
 });
+router.post("/forgot-password", recoveryLimiter, async (req,res,next)=>{try{const email=String(req.body.email||"").trim().toLowerCase();if(!/^\S+@\S+\.\S+$/.test(email))return res.status(400).json({message:"Enter a valid email address"});await authService.requestPasswordReset(email);res.json({data:{message:"If that account exists, a recovery email has been sent."}})}catch(error){next(error)}});
+router.post("/reset-password", recoveryLimiter, async(req,res,next)=>{try{const accessToken=String(req.body.accessToken||""),password=String(req.body.password||"");if(!accessToken||password.length<10)return res.status(400).json({message:"Use a valid recovery link and a password of at least 10 characters"});await authService.updatePassword(accessToken,password);res.json({data:{success:true}})}catch(error){next(error)}});
 router.get("/me", requireAuth, (req, res) => res.json({ data: { user: { id: req.user.sub, email: req.user.email, displayName: req.user.name, role: req.user.role } } }));
 router.post("/logout", (_req, res) => { res.clearCookie("cgdm_session", { path: "/" });res.clearCookie("cgdm_refresh",{path:"/api/auth"}); res.json({ data: { success: true } }); });
 export default router;

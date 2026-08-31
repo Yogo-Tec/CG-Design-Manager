@@ -26,5 +26,16 @@ export const authService={
       return{sub:data.user.id,email:data.user.email,name:data.user.user_metadata?.display_name||data.user.email.split("@")[0],role:supabaseRole(data.user)};
     }
     return jwt.verify(token,secret,{issuer:"cgdm"});
+  },
+  async requestPasswordReset(email){
+    if(!supabaseEnabled)throw Object.assign(new Error("Password recovery is not configured"),{status:503});
+    const redirectTo=process.env.PASSWORD_RESET_REDIRECT_URL||`http://localhost:${process.env.PORT||3000}/pages/reset-password.html`;
+    const{error}=await supabase.auth.resetPasswordForEmail(email,{redirectTo});
+    if(error)throw Object.assign(new Error("Unable to send password recovery email"),{status:502});
+  },
+  async updatePassword(accessToken,password){
+    if(!supabaseEnabled)throw Object.assign(new Error("Password recovery is not configured"),{status:503});
+    const response=await fetch(`${process.env.SUPABASE_URL}/auth/v1/user`,{method:"PUT",headers:{apikey:process.env.SUPABASE_ANON_KEY,authorization:`Bearer ${accessToken}`,"content-type":"application/json"},body:JSON.stringify({password})});
+    if(!response.ok)throw Object.assign(new Error("This recovery link is invalid or expired"),{status:401});
   }
 };
