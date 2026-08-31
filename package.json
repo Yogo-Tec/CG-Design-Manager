@@ -8,6 +8,7 @@
     "dev": "node --watch server/src/server.js",
     "start": "node server/src/server.js",
     "db:migrate": "node server/scripts/migrate.js",
+    "user:make-admin": "node server/scripts/set-admin-role.js",
     "backup": "node server/scripts/backup.js",
     "verify:production": "node server/scripts/verify-production.js",
     "test": "node --test"
