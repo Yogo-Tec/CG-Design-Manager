@@ -1,6 +1,7 @@
 process.env.SUPABASE_URL="";
 process.env.SUPABASE_ANON_KEY="";
 process.env.DATABASE_URL="";
+process.env.LOCAL_AUTH_BYPASS="false";
 import test from "node:test";
 import assert from "node:assert/strict";
 const { app } = await import("../server/src/app.js");
