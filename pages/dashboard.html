@@ -51,20 +51,20 @@
 
       <main class="content">
         <section class="page-heading">
-          <div><p class="eyebrow">Monday, 31 August</p><h1>Good morning, Arjun</h1><p>Here’s what’s happening across your design studio today.</p></div>
-          <button class="btn btn-primary primary-action"><i class="bi bi-plus-lg"></i> New design job</button>
+          <div><p class="eyebrow" id="todayLabel">Studio overview</p><h1 id="welcomeHeading">Your creative operations hub</h1><p>Live workload, approvals and revenue from your connected workspace.</p></div>
+          <a class="btn btn-primary primary-action" href="/pages/operations.html#jobs"><i class="bi bi-plus-lg"></i> New design job</a>
         </section>
 
         <section class="metrics-grid" aria-label="Key metrics">
-          <article class="metric-card"><div class="metric-icon blue"><i class="bi bi-folder2-open"></i></div><div><span>Active projects</span><strong>24</strong><small class="positive"><i class="bi bi-arrow-up"></i> 8% this month</small></div></article>
-          <article class="metric-card"><div class="metric-icon violet"><i class="bi bi-palette2"></i></div><div><span>Jobs in progress</span><strong>18</strong><small>Across 9 designers</small></div></article>
-          <article class="metric-card"><div class="metric-icon amber"><i class="bi bi-hourglass-split"></i></div><div><span>Awaiting approval</span><strong>7</strong><small class="attention">3 due today</small></div></article>
-          <article class="metric-card"><div class="metric-icon green"><i class="bi bi-currency-rupee"></i></div><div><span>Revenue this month</span><strong>₹2.48L</strong><small class="positive"><i class="bi bi-arrow-up"></i> 12.4% vs last month</small></div></article>
+          <article class="metric-card"><div class="metric-icon blue"><i class="bi bi-folder2-open"></i></div><div><span>Active projects</span><strong id="activeProjects">—</strong><small>Live portfolio</small></div></article>
+          <article class="metric-card"><div class="metric-icon violet"><i class="bi bi-palette2"></i></div><div><span>Jobs in progress</span><strong id="jobsInProgress">—</strong><small id="designerCount">Across the studio</small></div></article>
+          <article class="metric-card"><div class="metric-icon amber"><i class="bi bi-hourglass-split"></i></div><div><span>Awaiting approval</span><strong id="awaitingApproval">—</strong><small class="attention" id="dueToday">Loading deadlines</small></div></article>
+          <article class="metric-card"><div class="metric-icon green"><i class="bi bi-currency-rupee"></i></div><div><span>Revenue this month</span><strong id="revenueThisMonth">—</strong><small id="revenueTrend">Compared with last month</small></div></article>
         </section>
 
         <div class="dashboard-grid">
           <section class="panel work-panel">
-            <div class="panel-heading"><div><h2>Priority work</h2><p>Jobs requiring attention today</p></div><a href="#">View all <i class="bi bi-arrow-right"></i></a></div>
+            <div class="panel-heading"><div><h2>Priority work</h2><p>Jobs requiring attention today</p></div><a href="/pages/operations.html#jobs">View all <i class="bi bi-arrow-right"></i></a></div>
             <div class="table-responsive">
               <table class="table align-middle mb-0">
                 <thead><tr><th>Design job</th><th>Client</th><th>Designer</th><th>Status</th><th>Due</th><th></th></tr></thead>
@@ -79,7 +79,7 @@
           </section>
 
           <section class="panel workload-panel">
-            <div class="panel-heading"><div><h2>Designer workload</h2><p>Current capacity this week</p></div><a href="#">Manage team</a></div>
+            <div class="panel-heading"><div><h2>Designer workload</h2><p>Current capacity this week</p></div><a href="/pages/operations.html#designers">Manage team</a></div>
             <div id="workloadList" class="workload-list"></div>
           </section>
 

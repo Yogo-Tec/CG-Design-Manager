@@ -6,4 +6,5 @@ router.get("/",async(req,res,next)=>{try{res.json({data:{clients:await clientSer
 router.get("/:id",async(req,res,next)=>{try{const client=await clientService.find(req.params.id);if(!client)return res.status(404).json({message:"Client not found"});res.json({data:{client}})}catch(e){next(e)}});
 router.post("/",allowRoles("ADMIN"),async(req,res,next)=>{try{res.status(201).json({data:{client:await clientService.create(req.body)}})}catch(e){next(e)}});
 router.put("/:id",allowRoles("ADMIN"),async(req,res,next)=>{try{const client=await clientService.update(req.params.id,req.body);if(!client)return res.status(404).json({message:"Client not found"});res.json({data:{client}})}catch(e){next(e)}});
+router.delete("/:id",allowRoles("ADMIN"),async(req,res,next)=>{try{const removed=await clientService.remove(req.params.id);if(!removed)return res.status(404).json({message:"Client not found"});res.json({data:{success:true}})}catch(e){if(e.code==="23503")return res.status(409).json({message:"This client has projects and cannot be deleted yet. Archive the client or remove linked projects first."});next(e)}});
 export default router;

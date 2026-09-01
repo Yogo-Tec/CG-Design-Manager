@@ -1,2 +1,2 @@
 import { dashboardService } from "../services/dashboard.service.js";
-export function getDashboard(_req, res) { res.json({ data: dashboardService.getSummary() }); }
+export async function getDashboard(_req,res,next){try{res.json({data:await dashboardService.getSummary()})}catch(error){next(error)}}

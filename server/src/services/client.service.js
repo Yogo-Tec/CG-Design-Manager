@@ -4,5 +4,6 @@ function validate(body){const input={client_name:clean(body.client_name,120),com
 export const clientService={
   list:(filters)=>clientRepository.list(filters), find:(id)=>clientRepository.find(id),
   async create(body){const {input,errors}=validate(body);if(Object.keys(errors).length)throw Object.assign(new Error("Please correct the highlighted fields"),{status:422,errors});return clientRepository.create(input)},
-  async update(id,body){const {input,errors}=validate(body);if(Object.keys(errors).length)throw Object.assign(new Error("Please correct the highlighted fields"),{status:422,errors});return clientRepository.update(id,input)}
+  async update(id,body){const {input,errors}=validate(body);if(Object.keys(errors).length)throw Object.assign(new Error("Please correct the highlighted fields"),{status:422,errors});return clientRepository.update(id,input)},
+  remove:(id)=>clientRepository.remove(id)
 };

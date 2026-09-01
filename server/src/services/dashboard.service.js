@@ -1,24 +1,15 @@
-const data = {
-  priorityJobs: [
-    { id:"DJ-2026-084", title:"Festive Campaign Creatives", client:"Nexa Retail", designer:"Maya Rao", status:"In progress", statusClass:"in-progress", due:"Today" },
-    { id:"DJ-2026-079", title:"Product Catalogue 2026", client:"Arbor Living", designer:"Rohan Mehta", status:"In review", statusClass:"review", due:"Today" },
-    { id:"DJ-2026-077", title:"Restaurant Menu Refresh", client:"Saffron Table", designer:"Isha Nair", status:"Revision", statusClass:"revision", due:"Sep 01" },
-    { id:"DJ-2026-072", title:"Corporate Brand Deck", client:"Vantage Labs", designer:"Dev Shah", status:"Approval", statusClass:"approval", due:"Sep 02" }
-  ],
-  activities: [
-    { icon:"bi-patch-check", text:"<strong>Nexa Retail</strong> approved proof V3", time:"12 minutes ago" },
-    { icon:"bi-upload", text:"<strong>Maya Rao</strong> uploaded 4 design files", time:"38 minutes ago" },
-    { icon:"bi-chat-left-text", text:"A revision was requested for <strong>DJ-2026-077</strong>", time:"1 hour ago" },
-    { icon:"bi-credit-card", text:"Payment of <strong>₹32,500</strong> was recorded", time:"2 hours ago" }
-  ],
-  workload: [
-    { name:"Maya Rao", active:5, load:92 }, { name:"Rohan Mehta", active:4, load:76 },
-    { name:"Isha Nair", active:3, load:58 }, { name:"Dev Shah", active:2, load:42 }
-  ],
-  deadlines: [
-    { month:"AUG", day:"31", title:"Festive Campaign Creatives", client:"Nexa Retail" },
-    { month:"SEP", day:"01", title:"Restaurant Menu Refresh", client:"Saffron Table" },
-    { month:"SEP", day:"02", title:"Corporate Brand Deck", client:"Vantage Labs" }
-  ]
-};
-export const dashboardService = { getSummary: () => data };
+import { databaseEnabled, query } from "../config/database.js";
+
+const fallback={metrics:{activeProjects:24,jobsInProgress:18,awaitingApproval:7,revenueThisMonth:248000,revenuePreviousMonth:220500,designers:9,dueToday:3},priorityJobs:[{id:"DJ-2026-084",title:"Festive Campaign Creatives",client:"Nexa Retail",designer:"Maya Rao",status:"IN_PROGRESS",due:new Date().toISOString()},{id:"DJ-2026-079",title:"Product Catalogue",client:"Arbor Living",designer:"Rohan Mehta",status:"IN_REVIEW",due:new Date().toISOString()},{id:"DJ-2026-077",title:"Menu Refresh",client:"Saffron Table",designer:"Isha Nair",status:"REVISION",due:new Date().toISOString()},{id:"DJ-2026-072",title:"Brand Deck",client:"Vantage Labs",designer:"Dev Shah",status:"READY_FOR_APPROVAL",due:new Date().toISOString()}],activities:[],workload:[],deadlines:[]};
+
+export const dashboardService={async getSummary(){
+  if(!databaseEnabled)return fallback;
+  const [metrics,jobs,workload,deadlines,activities]=await Promise.all([
+    query(`SELECT (SELECT COUNT(*)::int FROM projects WHERE status='ACTIVE') "activeProjects",(SELECT COUNT(*)::int FROM design_jobs WHERE status NOT IN('COMPLETED','CANCELLED')) "jobsInProgress",(SELECT COUNT(*)::int FROM proofs WHERE status='READY_FOR_APPROVAL') "awaitingApproval",(SELECT COUNT(DISTINCT lead_designer_id)::int FROM design_jobs WHERE status NOT IN('COMPLETED','CANCELLED') AND lead_designer_id IS NOT NULL) designers,(SELECT COUNT(*)::int FROM design_jobs WHERE deadline=CURRENT_DATE AND status NOT IN('COMPLETED','CANCELLED')) "dueToday",(SELECT COALESCE(SUM(amount),0)::numeric FROM payments WHERE status='PAID' AND paid_at>=DATE_TRUNC('month',NOW())) "revenueThisMonth",(SELECT COALESCE(SUM(amount),0)::numeric FROM payments WHERE status='PAID' AND paid_at>=DATE_TRUNC('month',NOW())-INTERVAL '1 month' AND paid_at<DATE_TRUNC('month',NOW())) "revenuePreviousMonth"`),
+    query(`SELECT j.job_code id,j.title,COALESCE(c.company_name,c.client_name) client,COALESCE(d.name,'Unassigned') designer,j.status,j.deadline due FROM design_jobs j JOIN projects p ON p.id=j.project_id JOIN clients c ON c.id=p.client_id LEFT JOIN designers d ON d.id=j.lead_designer_id WHERE j.status NOT IN('COMPLETED','CANCELLED') ORDER BY j.priority DESC,j.deadline NULLS LAST LIMIT 6`),
+    query(`SELECT d.name,COUNT(j.id) FILTER(WHERE j.status NOT IN('COMPLETED','CANCELLED'))::int active,LEAST(100,COUNT(j.id) FILTER(WHERE j.status NOT IN('COMPLETED','CANCELLED'))*18)::int load FROM designers d LEFT JOIN design_jobs j ON j.lead_designer_id=d.id GROUP BY d.id ORDER BY load DESC LIMIT 6`),
+    query(`SELECT j.title,COALESCE(c.company_name,c.client_name) client,j.deadline FROM design_jobs j JOIN projects p ON p.id=j.project_id JOIN clients c ON c.id=p.client_id WHERE j.deadline BETWEEN CURRENT_DATE AND CURRENT_DATE+INTERVAL '7 days' AND j.status NOT IN('COMPLETED','CANCELLED') ORDER BY j.deadline LIMIT 6`),
+    query(`SELECT type,title,message,"createdAt" FROM (SELECT 'payment' type,'Payment recorded' title,COALESCE(reference,'Client payment')||' · ₹'||amount::text message,created_at "createdAt" FROM payments UNION ALL SELECT 'proof','Proof updated',status||' · version '||version_no::text,created_at FROM proofs UNION ALL SELECT 'revision','Revision logged',COALESCE(feedback,'Revision requested'),created_at FROM revisions) activity ORDER BY "createdAt" DESC LIMIT 6`)
+  ]);
+  return {metrics:metrics.rows[0],priorityJobs:jobs.rows,workload:workload.rows,deadlines:deadlines.rows,activities:activities.rows};
+}};
